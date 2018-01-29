@@ -45,7 +45,8 @@ export { default as WebGLManager } from './renderers/webgl/managers/WebGLManager
 export { default as ObjectRenderer } from './renderers/webgl/utils/ObjectRenderer';
 export { default as RenderTarget } from './renderers/webgl/utils/RenderTarget';
 export { default as Quad } from './renderers/webgl/utils/Quad';
-export { default as SpriteMaskFilter } from './renderers/webgl/filters/spriteMask/SpriteMaskFilter';
+export { default as SpriteMaskFilterFullColor } from './renderers/webgl/filters/spriteMask/SpriteMaskFilterFullColor';
+export { default as SpriteMaskFilterOnlyAlpha } from './renderers/webgl/filters/spriteMask/SpriteMaskFilterOnlyAlpha';
 export { default as Filter } from './renderers/webgl/filters/Filter';
 export { default as Application } from './Application';
 export { autoDetectRenderer } from './autoDetectRenderer';

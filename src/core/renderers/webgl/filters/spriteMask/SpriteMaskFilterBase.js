@@ -5,25 +5,22 @@ import { join } from 'path';
 import { default as TextureMatrix } from '../../../../textures/TextureMatrix';
 
 /**
- * The SpriteMaskFilter class
+ * The SpriteMaskFilterBase class
  *
  * @class
  * @extends PIXI.Filter
  * @memberof PIXI
  */
-export default class SpriteMaskFilter extends Filter
+export default class SpriteMaskFilterBase extends Filter
 {
     /**
      * @param {PIXI.Sprite} sprite - the target sprite
      */
-    constructor(sprite)
+    constructor(sprite, vertexSrc, fragmentSrc)
     {
         const maskMatrix = new Matrix();
 
-        super(
-            readFileSync(join(__dirname, './spriteMaskFilter.vert'), 'utf8'),
-            readFileSync(join(__dirname, './spriteMaskFilter.frag'), 'utf8')
-        );
+        super(vertexSrc, fragmentSrc);
 
         sprite.renderable = false;
 

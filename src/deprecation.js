@@ -971,16 +971,32 @@ export default function deprecation(core)
         /**
          * @class
          * @private
-         * @name PIXI.filters.SpriteMaskFilter
+         * @name PIXI.filters.SpriteMaskFilterFullColor
          * @see PIXI.SpriteMaskFilter
          * @deprecated since version 3.0.6
          */
-        SpriteMaskFilter: {
+        SpriteMaskFilterFullColor: {
             get()
             {
-                warn('filters.SpriteMaskFilter is an undocumented alias, please use SpriteMaskFilter from now on.');
+                warn('filters.SpriteMaskFilterFullColor is an undocumented alias, please use SpriteMaskFilter from now on.');
 
-                return core.SpriteMaskFilter;
+                return core.SpriteMaskFilterFullColor;
+            },
+        },
+
+        /**
+         * @class
+         * @private
+         * @name PIXI.filters.SpriteMaskFilterOnlyAlpha
+         * @see PIXI.SpriteMaskFilter
+         * @deprecated since version 3.0.6
+         */
+        SpriteMaskFilterOnlyAlpha: {
+            get()
+            {
+                warn('filters.SpriteMaskFilterOnlyAlpha is an undocumented alias, please use SpriteMaskFilter from now on.');
+
+                return core.SpriteMaskFilterOnlyAlpha;
             },
         },
 

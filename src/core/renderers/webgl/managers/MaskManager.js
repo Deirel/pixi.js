@@ -1,5 +1,6 @@
 import WebGLManager from './WebGLManager';
-import AlphaMaskFilter from '../filters/spriteMask/SpriteMaskFilter';
+import AlphaMaskFilterFullColor from '../filters/spriteMask/SpriteMaskFilterFullColor';
+import AlphaMaskFilterOnlyAlpha from '../filters/spriteMask/SpriteMaskFilterOnlyAlpha';
 
 /**
  * @class
@@ -24,6 +25,8 @@ export default class MaskManager extends WebGLManager
 
         this.alphaMaskPool = [];
         this.alphaMaskIndex = 0;
+
+        this.onlyAlpha = false;
     }
 
     /**
@@ -104,7 +107,11 @@ export default class MaskManager extends WebGLManager
 
         if (!alphaMaskFilter)
         {
-            alphaMaskFilter = this.alphaMaskPool[this.alphaMaskIndex] = [new AlphaMaskFilter(maskData)];
+            let filter = this.onlyAlpha 
+                    ? new AlphaMaskFilterOnlyAlpha(maskData) 
+                    : new AlphaMaskFilterFullColor(maskData);
+            
+            alphaMaskFilter = this.alphaMaskPool[this.alphaMaskIndex] = [filter];
         }
 
         alphaMaskFilter[0].resolution = this.renderer.resolution;

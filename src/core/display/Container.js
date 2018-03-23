@@ -236,7 +236,16 @@ export default class Container extends DisplayObject
 
             // TODO - lets either do all callbacks or all events.. not both!
             this.onChildrenChange(index);
-            child.emit('removed', this);
+
+            let event = new PIXI.DisplayListEvent();
+            event.target = child;
+            event.currentTarget = child;
+            event.type = 'removed';
+
+            event.data = new PIXI.DisplayListData();
+            event.data.parent = this;
+
+            child.emit('removed', event);
         }
 
         return child;
@@ -262,7 +271,16 @@ export default class Container extends DisplayObject
 
         // TODO - lets either do all callbacks or all events.. not both!
         this.onChildrenChange(index);
-        child.emit('removed', this);
+
+        let event = new PIXI.DisplayListEvent();
+        event.target = child;
+        event.currentTarget = child;
+        event.type = 'removed';
+
+        event.data = new PIXI.DisplayListData();
+        event.data.parent = this;
+
+        child.emit('removed', event);
 
         return child;
     }
@@ -300,7 +318,17 @@ export default class Container extends DisplayObject
 
             for (let i = 0; i < removed.length; ++i)
             {
-                removed[i].emit('removed', this);
+                let child = removed[i];
+
+                let event = new PIXI.DisplayListEvent();
+                event.target = child;
+                event.currentTarget = child;
+                event.type = 'removed';
+
+                event.data = new PIXI.DisplayListData();
+                event.data.parent = this;
+
+                child.emit('removed', event);
             }
 
             return removed;

@@ -16,6 +16,8 @@ export { default as glCore } from 'pixi-gl-core';
 
 export { default as Bounds } from './display/Bounds';
 export { default as DisplayObject } from './display/DisplayObject';
+export { default as DisplayListEvent } from './display/DisplayListEvent';
+export { default as DisplayListData } from './display/DisplayListData';
 export { default as Container } from './display/Container';
 export { default as Transform } from './display/Transform';
 export { default as TransformStatic } from './display/TransformStatic';

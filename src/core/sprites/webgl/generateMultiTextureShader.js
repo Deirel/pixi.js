@@ -5,6 +5,7 @@ import { join } from 'path';
 const fragTemplate = [
     'varying vec2 vTextureCoord;',
     'varying vec4 vColor;',
+    'varying vec4 vOffset;',
     'varying float vTextureId;',
     'uniform sampler2D uSamplers[%count%];',
 
@@ -12,7 +13,7 @@ const fragTemplate = [
     'vec4 color;',
     'float textureId = floor(vTextureId+0.5);',
     '%forloop%',
-    'gl_FragColor = color * vColor;',
+    'gl_FragColor = color * vColor + vOffset;',
     '}',
 ].join('\n');
 

@@ -1,11 +1,6 @@
 /**
  * The TextMetrics object represents the measurement of a block of text with a specified style.
  *
- * ```js
- * let style = new PIXI.TextStyle({fontFamily : 'Arial', fontSize: 24, fill : 0xff1010, align : 'center'})
- * let textMetrics = PIXI.TextMetrics.measureText('Your text', style)
- * ```
- *
  * @class
  * @memberOf PIXI
  */
@@ -108,151 +103,86 @@ export default class TextMetrics
     {
         const context = canvas.getContext('2d');
 
-        let line = '';
-        let width = 0;
-        let lines = '';
-        const cache = {};
-        const ls = style.letterSpacing;
+        // Greedy wrapping algorithm that will wrap words as the line grows longer
+        // than its horizontal bounds.
+        let result = '';
+        const firstChar = text.charAt(0);
+        const lines = text.split('\n');
+        const wordWrapWidth = style.wordWrapWidth;
+        const characterCache = {};
 
-        // ideally there is letterSpacing after every char except the last one
-        // t_h_i_s_' '_i_s_' '_a_n_' '_e_x_a_m_p_l_e_' '_!
-        // so for convenience the above needs to be compared to width + 1 extra space
-        // t_h_i_s_' '_i_s_' '_a_n_' '_e_x_a_m_p_l_e_' '_!_
-        // ________________________________________________
-        // And then the final space is simply no appended to each line
-        const wordWrapWidth = style.wordWrapWidth + style.letterSpacing;
-
-        // get the width of a space and add it to cache
-        const spaceWidth = TextMetrics.getFromCache(' ', ls, cache, context);
-
-        // break text into words
-        const words = text.split(' ');
-
-        for (let i = 0; i < words.length; i++)
+        for (let i = 0; i < lines.length; i++)
         {
-            const word = words[i];
+            let spaceLeft = wordWrapWidth;
+            const words = lines[i].split(' ');
 
-            // get word width from cache if possible
-            const wordWidth = TextMetrics.getFromCache(word, ls, cache, context);
-
-            // word is longer than desired bounds
-            if (wordWidth > wordWrapWidth)
+            for (let j = 0; j < words.length; j++)
             {
-                // break large word over multiple lines
-                if (style.breakWords)
+                const wordWidth = context.measureText(words[j]).width;
+
+                if (style.breakWords && wordWidth > wordWrapWidth)
                 {
-                    // add a space to the start of the word unless its at the beginning of the line
-                    const tmpWord = (line.length > 0) ? ` ${word}` : word;
+                    // Word should be split in the middle
+                    const characters = words[j].split('');
 
-                    // break word into characters
-                    const characters = tmpWord.split('');
-
-                    // loop the characters
-                    for (let j = 0; j < characters.length; j++)
+                    for (let c = 0; c < characters.length; c++)
                     {
-                        const character = characters[j];
-                        const characterWidth = TextMetrics.getFromCache(character, ls, cache, context);
+                        const character = characters[c];
+                        let characterWidth = characterCache[character];
 
-                        if (characterWidth + width > wordWrapWidth)
+                        if (characterWidth === undefined)
                         {
-                            lines += TextMetrics.addLine(line);
-                            line = '';
-                            width = 0;
+                            characterWidth = context.measureText(character).width;
+                            characterCache[character] = characterWidth;
                         }
 
-                        line += character;
-                        width += characterWidth;
+                        if (characterWidth > spaceLeft)
+                        {
+                            result += `\n${character}`;
+                            spaceLeft = wordWrapWidth - characterWidth;
+                        }
+                        else
+                        {
+                            if (c === 0 && (j > 0 || firstChar === ' '))
+                            {
+                                result += ' ';
+                            }
+
+                            result += character;
+                            spaceLeft -= characterWidth;
+                        }
                     }
                 }
-
-                // run word out of the bounds
                 else
                 {
-                   // if there are words in this line already
-                    // finish that line and start a new one
-                    if (line.length > 0)
+                    const wordWidthWithSpace = wordWidth + context.measureText(' ').width;
+
+                    if (j === 0 || wordWidthWithSpace > spaceLeft)
                     {
-                        lines += TextMetrics.addLine(line);
-                        line = '';
-                        width = 0;
+                        // Skip printing the newline if it's the first word of the line that is
+                        // greater than the word wrap width.
+                        if (j > 0)
+                        {
+                            result += '\n';
+                        }
+                        result += words[j];
+                        spaceLeft = wordWrapWidth - wordWidth;
                     }
-
-                    // give it its own line
-                    lines += TextMetrics.addLine(word);
-                    line = '';
-                    width = 0;
+                    else
+                    {
+                        spaceLeft -= wordWidthWithSpace;
+                        result += ` ${words[j]}`;
+                    }
                 }
             }
 
-            // word could fit
-            else
+            if (i < lines.length - 1)
             {
-                // word won't fit, start a new line
-                if (wordWidth + width > wordWrapWidth)
-                {
-                    lines += TextMetrics.addLine(line);
-                    line = '';
-                    width = 0;
-                }
-
-                // add the word to the current line
-                if (line.length > 0)
-                {
-                    // add a space if it is not the beginning
-                    line += ` ${word}`;
-                }
-                else
-                {
-                    // add without a space if it is the beginning
-                    line += word;
-                }
-
-                width += wordWidth + spaceWidth;
+                result += '\n';
             }
         }
 
-        lines += TextMetrics.addLine(line, false);
-
-        return lines;
-    }
-
-    /**
-     *  Convienience function for logging each line added
-     *  during the wordWrap method
-     *
-     * @param  {string}   line    - The line of text to add
-     * @param  {boolean}  newLine - Add new line character to end
-     * @return {string}   A formatted line
-     */
-    static addLine(line, newLine = true)
-    {
-        line = (newLine) ? `${line}\n` : line;
-
-        return line;
-    }
-
-    /**
-     * Gets & sets the widths of calculated characters in a cache object
-     *
-     * @param  {string}                    key            The key
-     * @param  {number}                    letterSpacing  The letter spacing
-     * @param  {object}                    cache          The cache
-     * @param  {CanvasRenderingContext2D}  context        The canvas context
-     * @return {number}                    The from cache.
-     */
-    static getFromCache(key, letterSpacing, cache, context)
-    {
-        let width = cache[key];
-
-        if (width === undefined)
-        {
-            const spacing = ((key.length) * letterSpacing);
-
-            width = context.measureText(key).width + spacing;
-            cache[key] = width;
-        }
-
-        return width;
+        return result;
     }
 
     /**

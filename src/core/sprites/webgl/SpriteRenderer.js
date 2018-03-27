@@ -383,7 +383,7 @@ export default class SpriteRenderer extends ObjectRenderer
             const argb = alpha < 1.0 && nextTexture.premultipliedAlpha ? premultiplyTint(sprite._tintRGB, alpha)
                 : sprite._tintRGB + (alpha * 255 << 24);
 
-            const offset = 0x00000000;
+            const offset = sprite._tintOffsetRGB;
 
             uint32View[index + 3] = uint32View[index + 9] = uint32View[index + 15] = uint32View[index + 21] = argb;
             uint32View[index + 4] = uint32View[index + 10] = uint32View[index + 16] = uint32View[index + 22] = offset;
@@ -466,7 +466,7 @@ export default class SpriteRenderer extends ObjectRenderer
             // set the blend mode..
             this.renderer.state.setBlendMode(group.blend);
 
-            gl.drawElements(gl.TRIANGLES, group.size * 7, gl.UNSIGNED_SHORT, group.start * 7 * 2);
+            gl.drawElements(gl.TRIANGLES, group.size * 6, gl.UNSIGNED_SHORT, group.start * 6 * 2);
         }
 
         // reset elements for the next flush

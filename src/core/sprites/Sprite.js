@@ -74,6 +74,10 @@ export default class Sprite extends Container
         this._tintRGB = null;
         this.tint = 0xFFFFFF;
 
+        this._tintOffset = null;
+        this._tintOffsetRGB = null;
+        this.tintOffset = 0x000000;
+
         /**
          * The blend mode to be applied to the sprite. Apply a value of `PIXI.BLEND_MODES.NORMAL` to reset the blend mode.
          *
@@ -553,7 +557,20 @@ export default class Sprite extends Container
     set tint(value) // eslint-disable-line require-jsdoc
     {
         this._tint = value;
+        value &= 0xffffff;
         this._tintRGB = (value >> 16) + (value & 0xff00) + ((value & 0xff) << 16);
+    }
+
+    get tintOffset()
+    {
+        return this._tintOffset;
+    }
+
+    set tintOffset(value)
+    {
+        this._tintOffset = value;
+        value &= 0xffffff;
+        this._tintOffsetRGB = (value >> 16) + (value & 0xff00) + ((value & 0xff) << 16);
     }
 
     /**

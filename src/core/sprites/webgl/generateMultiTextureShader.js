@@ -13,7 +13,9 @@ const fragTemplate = [
     'vec4 color;',
     'float textureId = floor(vTextureId+0.5);',
     '%forloop%',
-    'gl_FragColor = color * vColor + vOffset;',
+    'vec3 offset = vOffset.rgb * color.a;',
+    'color *= vColor;',
+    'gl_FragColor = vec4(clamp(color.rgb + offset, vec3(0.0), vec3(1.0)), color.a);',
     '}',
 ].join('\n');
 
